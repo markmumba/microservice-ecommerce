@@ -10,9 +10,9 @@ service ProductService {
 
   rpc createProduct (ProductRequest) returns (ProductResponse) {}
 
-  rpc getProducts (Empty) returns (ProductListResponse){}
+  rpc getProducts (Empty) returns (stream ProductListResponse){}
 
-  rpc getProductsByCategory(ProductCategoryId) returns (ProductListResponse) {}
+  rpc getProductsByCategory(ProductCategoryId) returns (stream ProductListResponse) {}
 
   rpc getProductById(ProductId) returns (ProductResponse){}
 
