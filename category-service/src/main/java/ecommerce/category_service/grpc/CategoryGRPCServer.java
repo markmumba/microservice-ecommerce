@@ -11,6 +11,8 @@ import org.mapstruct.NullValueCheckStrategy;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.springframework.grpc.server.service.GrpcService;
 
+import java.util.List;
+
 
 @GrpcService
 @AllArgsConstructor
@@ -25,26 +27,52 @@ public class CategoryGRPCServer extends CategoryServiceGrpc.CategoryServiceImplB
 
     @Override
     public void createCategory(CategoryRequest request, StreamObserver<CategoryResponse> responseObserver) {
-        super.createCategory(request, responseObserver);
+        CategoryResponse response = categoryService.createCategory(request);
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
     }
 
     @Override
     public void getAllCategories(Empty request, StreamObserver<CategoryList> responseObserver) {
-        super.getAllCategories(request, responseObserver);
+        List<CategoryListResponse> categories = categoryService.getAllCategories();
+        CategoryList response = CategoryList.newBuilder()
+                .addAllCategories(categories)
+                .build();
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
     }
+
 
     @Override
     public void getCategoryById(CategoryId request, StreamObserver<CategoryResponse> responseObserver) {
-        super.getCategoryById(request, responseObserver);
+
+        CategoryResponse response =  categoryService.getCategoryById(request.getId());
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
     }
 
     @Override
     public void updateCategory(UpdateCategory request, StreamObserver<MessageResponse> responseObserver) {
-        super.updateCategory(request, responseObserver);
+        String message = categoryService.updateCategory(request.getId(),request);
+        MessageResponse response = MessageResponse.newBuilder()
+                .setResponse(message)
+                .build();
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+
     }
+
 
     @Override
     public void deleteCategory(CategoryId request, StreamObserver<MessageResponse> responseObserver) {
-        super.deleteCategory(request, responseObserver);
+        String message = categoryService.deleteCategory(request.getId());
+        MessageResponse response = MessageResponse.newBuilder()
+                .setResponse(message)
+                .build();
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
     }
 }

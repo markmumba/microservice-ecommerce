@@ -7,10 +7,8 @@ import ecommerce.category_service.Category.dto.CategoryMapper;
 import ecommerce.proto_service.grpc.category.CategoryListResponse;
 import ecommerce.proto_service.grpc.category.CategoryRequest;
 import ecommerce.proto_service.grpc.category.CategoryResponse;
-import ecommerce.proto_service.grpc.product.ProductCategoryId;
-import ecommerce.proto_service.grpc.product.ProductItem;
-import ecommerce.proto_service.grpc.product.ProductListResponse;
-import ecommerce.proto_service.grpc.product.ProductServiceGrpc;
+import ecommerce.proto_service.grpc.category.UpdateCategory;
+import ecommerce.proto_service.grpc.product.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -58,7 +56,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public String updateCategory(String id, CategoryRequest request) {
+    public String updateCategory(String id, UpdateCategory request) {
         Category category = categoryRepository.findById(id).orElseThrow(
                 () -> new IllegalArgumentException("Category with given id not available")
         );
