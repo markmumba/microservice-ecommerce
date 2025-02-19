@@ -6,9 +6,6 @@ import ecommerce.category_service.Category.CategoryService;
 import ecommerce.proto_service.grpc.category.*;
 import io.grpc.stub.StreamObserver;
 import lombok.AllArgsConstructor;
-import org.mapstruct.Mapper;
-import org.mapstruct.NullValueCheckStrategy;
-import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.springframework.grpc.server.service.GrpcService;
 
 import java.util.List;
@@ -16,11 +13,6 @@ import java.util.List;
 
 @GrpcService
 @AllArgsConstructor
-@Mapper(
-        componentModel = "spring",
-        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
-        nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS
-)
 public class CategoryGRPCServer extends CategoryServiceGrpc.CategoryServiceImplBase {
 
     private final CategoryService categoryService;

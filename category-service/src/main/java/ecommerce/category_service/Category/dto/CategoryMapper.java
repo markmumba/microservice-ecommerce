@@ -38,7 +38,10 @@ public class CategoryMapper {
     }
 
     public CategoryListResponse fromEntityList (Category category){
-        return CategoryListResponse.newBuilder().
+        return CategoryListResponse.newBuilder()
+                .setId(category.getId())
+                .setName(category.getName())
+                .build();
     }
 
 }

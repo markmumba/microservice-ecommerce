@@ -2,7 +2,6 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.4.2'
 	id 'io.spring.dependency-management' version '1.1.7'
-	id 'com.netflix.dgs.codegen' version '7.0.3'
 }
 
 group = 'ecommerce'
@@ -26,14 +25,12 @@ ext {
 dependencies {
 
 	implementation 'ecommerce:proto-library:0.0.1-SNAPSHOT'
-	implementation 'io.grpc:grpc-netty-shaded'
+	implementation 'io.grpc:grpc-netty'
 	implementation 'io.grpc:grpc-protobuf'
 	implementation 'io.grpc:grpc-services'
 	implementation 'io.grpc:grpc-stub'
 	implementation 'org.springframework.grpc:spring-grpc-spring-boot-starter'
 
-	implementation 'org.mapstruct:mapstruct:1.6.3'
-	annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
 
 	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 	compileOnly 'org.projectlombok:lombok'

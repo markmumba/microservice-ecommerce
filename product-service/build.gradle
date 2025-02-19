@@ -27,7 +27,7 @@ repositories {
 
 dependencies {
 	implementation 'ecommerce:proto-library:0.0.1-SNAPSHOT'
-	implementation 'io.grpc:grpc-netty-shaded'
+	implementation 'io.grpc:grpc-netty'
 	implementation 'io.grpc:grpc-protobuf'
 	implementation 'io.grpc:grpc-services'
 	implementation 'io.grpc:grpc-stub'
