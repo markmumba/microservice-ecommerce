@@ -1,0 +1,23 @@
+services:
+  category-service:
+    build: .
+    ports:
+      - "8082:8080"
+    environment:
+      DATABASE_URI: ${DOCKER_DATABASE_URI}
+    depends_on:
+      - mongodb
+    profiles:
+      - with-backend
+
+
+  mongodb:
+    container_name: category-db
+    image: mongo:latest
+    volumes:
+      - dbdata6:/data/db
+    ports:
+      - "27019:27017"
+
+volumes:
+  dbdata6:

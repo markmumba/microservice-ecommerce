@@ -1,0 +1,59 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+
+
+option java_multiple_files=true;
+option java_package="ecommerce.proto_service.grpc.category";
+option java_outer_classname="CategoryProto";
+
+
+service CategoryService {
+  rpc  createCategory(CategoryRequest) returns (CategoryResponse);
+  rpc  getAllCategories(google.protobuf.Empty) returns (stream CategoryList);
+  rpc getCategoryById(CategoryId) returns (CategoryResponse);
+  rpc updateCategory(UpdateCategory) returns (MessageResponse);
+  rpc deleteCategory(CategoryId) returns (MessageResponse);
+}
+
+
+message  CategoryResponse {
+  string id = 1 ;
+  string name = 2;
+  string description = 3;
+  repeated CategoryProductItem products = 4;
+}
+
+
+message CategoryRequest {
+  string name = 1;
+  string description = 2;
+}
+
+message UpdateCategory{
+  string id = 1 ;
+  string name = 2;
+  string description = 3;
+}
+
+message CategoryListResponse {
+  string id = 1 ;
+  string name = 2;
+}
+message CategoryId{
+  string id=1;
+}
+
+message CategoryProductItem {
+  string id = 1;
+  string name = 2;
+  string price = 3;
+}
+
+message CategoryList{
+  repeated CategoryListResponse categories =1;
+}
+
+message MessageResponse{
+  string response =1;
+}

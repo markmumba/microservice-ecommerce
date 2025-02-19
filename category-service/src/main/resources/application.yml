@@ -1,0 +1,22 @@
+
+spring:
+  application:
+    name: category-service
+  data:
+    mongodb:
+      uri: ${DATABASE_URI:mongodb://localhost:27019/category}
+  grpc:
+    server:
+      port: ${PORT:9092}
+
+    client:
+      channels:
+        product-service:
+          address: 0.0.0.0:9091
+
+
+
+
+
+server:
+  port: ${PORT}

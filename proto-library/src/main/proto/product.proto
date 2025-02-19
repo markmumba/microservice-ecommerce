@@ -1,0 +1,67 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "ecommerce.proto_service.grpc.product";
+option java_outer_classname = "ProductProto";
+
+package Product;
+
+service ProductService {
+
+  rpc createProduct (ProductRequest) returns (ProductResponse) {}
+
+  rpc getProducts (Empty) returns (ProductListResponse){}
+
+  rpc getProductsByCategory(ProductCategoryId) returns (ProductListResponse) {}
+
+  rpc getProductById(ProductId) returns (ProductResponse){}
+
+  rpc updateProduct(UpdateRequest) returns (MessageResponse) {}
+
+  rpc deleteProduct(ProductId) returns (MessageResponse){}
+
+}
+message Empty {}
+
+message ProductId {
+  string id = 1 ;
+}
+
+message ProductCategoryId {
+  string id = 1;
+}
+message MessageResponse {
+  string response = 1;
+
+}
+message ProductRequest {
+  string name = 1;
+  string price = 2;
+  string categoryId = 3;
+}
+message UpdateRequest {
+  string id = 1;
+  string name = 3;
+  string price = 4;
+  string categoryId = 5;
+
+}
+
+message ProductResponse {
+  string id = 1;
+  string productCode = 2;
+  string name = 3;
+  string price = 4;
+  string categoryId = 5;
+
+}
+
+message ProductItem {
+  string id = 1;
+  string name = 2;
+  string price = 3;
+}
+message ProductListResponse {
+  repeated ProductItem products = 1;
+}
+

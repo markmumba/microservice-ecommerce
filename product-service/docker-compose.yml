@@ -1,0 +1,25 @@
+
+
+services:
+  product-service:
+    build: .
+    ports:
+      - "8081:8080"
+    environment:
+      DATABASE_URI: ${DOCKER_DATABASE_URI}
+    depends_on:
+      - mongodb
+    profiles:
+      - with-backend
+
+
+  mongodb:
+    container_name: product-db
+    image: mongo:latest
+    volumes:
+      - dbdata6:/data/db
+    ports:
+      - "27018:27017"
+
+volumes:
+  dbdata6:
