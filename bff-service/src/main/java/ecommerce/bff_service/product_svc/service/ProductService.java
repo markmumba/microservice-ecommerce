@@ -24,8 +24,8 @@ import java.util.concurrent.CompletableFuture;
 @RequiredArgsConstructor
 public class ProductService{
 
-    private final ProductServiceGrpc.ProductServiceStub productClient;
-    private final ProductServiceGrpc.ProductServiceBlockingStub productBlockingClient;
+    private final ProductServiceGrpc.ProductServiceStub asyncProductClient;
+    private final ProductServiceGrpc.ProductServiceBlockingStub productClient;
 
     /**
      *
@@ -40,7 +40,7 @@ public class ProductService{
         List<Product> products = new ArrayList<>();
         Empty request = Empty.newBuilder().build();
 
-        productClient.getProducts(request, new StreamObserver<>() {
+        asyncProductClient.getProducts(request, new StreamObserver<>() {
             @Override
             public void onNext(ProductListResponse value) {
                 products.addAll(ProductMapper.INSTANCE.grpcToDtos(value.getProductsList()));
@@ -61,25 +61,25 @@ public class ProductService{
 
     public Product createProduct (ProductInput input) {
         ProductRequest request =  ProductMapper.INSTANCE.dtoToGrpc(input);
-        ProductResponse response = productBlockingClient.createProduct(request);
+        ProductResponse response = productClient.createProduct(request);
         return ProductMapper.INSTANCE.grpcToDto(response);
     }
 
     public Product getProductById (String id) {
         ProductId productId = ProductId.newBuilder().setId(id).build();
-        ProductResponse response = productBlockingClient.getProductById(productId);
+        ProductResponse response = productClient.getProductById(productId);
         return ProductMapper.INSTANCE.grpcToDto(response);
     }
 
     public String updateProduct (ProductInput input ) {
         UpdateRequest request = ProductMapper.INSTANCE.updateDtoToGrpcUpdate(input);
-        MessageResponse message = productBlockingClient.updateProduct(request);
+        MessageResponse message = productClient.updateProduct(request);
         return ProductMapper.INSTANCE.messageGrpcToDtoMessage(message);
     }
 
     public String deleteProduct (String id) {
         ProductId productId = ProductId.newBuilder().setId(id).build();
-        MessageResponse message = productBlockingClient.deleteProduct(productId);
+        MessageResponse message = productClient.deleteProduct(productId);
         return ProductMapper.INSTANCE.messageGrpcToDtoMessage(message);
     }
 

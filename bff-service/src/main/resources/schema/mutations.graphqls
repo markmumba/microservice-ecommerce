@@ -1,7 +1,7 @@
 
 type Mutation {
     # category mutations
-    createCategories(input:CategoryInput):Category
+    createCategory(input:CategoryInput):Category
     updateCategory(input:CategoryInput):String
     deleteCategory(id:String):String
     #product mutations
