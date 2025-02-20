@@ -1,0 +1,16 @@
+
+input ProductInput {
+    id:String
+    name:String!
+    price:String!
+    categoryId:String!
+}
+
+type Product {
+    id: ID!
+    name:String!
+    productCode:String
+    price:String!
+     categoryId:String
+}
+

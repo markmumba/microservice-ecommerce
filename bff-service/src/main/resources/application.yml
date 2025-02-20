@@ -3,10 +3,16 @@ spring:
   application:
     name: bff-service
 
+
   grpc:
     client:
       channels:
         product-service:
-          address: 0.0.0.0:9091
+          address: ${PRODUCT_SERVICE_ADDRESS:localhost:9091}
+          negotiation-type: PLAINTEXT
+        category-service:
+          address: ${CATEGORY_SERVICE_ADDRESS:localhost:9092}
+          negotiation-type: PLAINTEXT
+
 
 

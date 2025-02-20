@@ -11,11 +11,6 @@ spring:
     mongodb:
       uri: ${DATABASE_URI:mongodb://localhost:27018/product}
 
-  graphql:
-    graphiql:
-      enabled: true
-
-
 
 #logging:
 #  level:

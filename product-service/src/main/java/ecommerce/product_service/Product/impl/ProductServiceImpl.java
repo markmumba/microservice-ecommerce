@@ -10,17 +10,21 @@ import ecommerce.proto_service.grpc.product.ProductRequest;
 import ecommerce.proto_service.grpc.product.ProductResponse;
 import ecommerce.proto_service.grpc.product.UpdateRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
+
+
 
     @Override
     public ProductResponse createProduct(ProductRequest request) {
@@ -43,6 +47,16 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<ProductItem> getAllProducts() {
+
+        log.info("*".repeat(30));
+        log.info("This is the product microservices : the get all products service");
+        log.info("*".repeat(30));
+        log.info("This is what we return ");
+
+        log.info( productRepository.findAll().stream()
+                .map(productMapper::fromEntityList)
+                .toList().toString());
+
         return productRepository.findAll().stream()
                 .map(productMapper::fromEntityList)
                 .toList();

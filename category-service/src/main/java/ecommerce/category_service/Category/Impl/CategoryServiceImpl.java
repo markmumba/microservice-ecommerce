@@ -9,11 +9,14 @@ import ecommerce.proto_service.grpc.category.CategoryRequest;
 import ecommerce.proto_service.grpc.category.CategoryResponse;
 import ecommerce.proto_service.grpc.category.UpdateCategory;
 import ecommerce.proto_service.grpc.product.*;
+import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * @author markianmwangi
@@ -24,7 +27,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
 
-    private final ProductServiceGrpc.ProductServiceBlockingStub productStub;
+    private final ProductServiceGrpc.ProductServiceStub productStub;
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
 
@@ -43,8 +46,31 @@ public class CategoryServiceImpl implements CategoryService {
         );
 
         ProductCategoryId categoryId = ProductCategoryId.newBuilder().setId(category.getId()).build();
-        ProductListResponse response = productStub.getProductsByCategory(categoryId);
-        List<ProductItem> productItems = response.getProductsList();
+        List<ProductItem> productItems =  new ArrayList<>();
+
+        CountDownLatch latch = new CountDownLatch(1);
+
+        productStub.getProductsByCategory(categoryId, new StreamObserver<ProductListResponse>() {
+            @Override
+            public void onNext(ProductListResponse value) {
+                productItems.addAll(value.getProductsList());
+
+            }
+            @Override
+            public void onError(Throwable t) {
+                System.err.println("Error receiving gRPC stream: " + t.getMessage());
+                latch.countDown();
+            }
+            @Override
+            public void onCompleted() {
+                latch.countDown();
+            }
+        });
+        try {
+            latch.await();
+        }catch (InterruptedException e) {
+            throw new RuntimeException("Interrupted while waiting for grpc response ",e);
+        }
         return categoryMapper.fromEntity(category,productItems);
     }
 

@@ -5,6 +5,7 @@ import ecommerce.proto_service.grpc.product.*;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.grpc.server.service.GrpcService;
 
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.List;
  *
  */
 
+@Slf4j
 @GrpcService
 @AllArgsConstructor
 public class ProductGRPCServer extends ProductServiceGrpc.ProductServiceImplBase {
@@ -29,11 +31,22 @@ public class ProductGRPCServer extends ProductServiceGrpc.ProductServiceImplBase
 
     @Override
     public void getProducts(Empty request, StreamObserver<ProductListResponse> responseObserver) {
+        log.info("*".repeat(30));
+        log.info("This is the product microservice: the grpc server getAllProducts ");
+        log.info("*".repeat(30));
+
+
+
         List<ProductItem> productItems = productService.getAllProducts();
 
         ProductListResponse response = ProductListResponse.newBuilder()
                 .addAllProducts(productItems)
                 .build();
+
+        log.info("");
+        log.info("This is what we take to the client ");
+        log.info(response.toString());
+        log.info("");
 
         responseObserver.onNext(response);
         responseObserver.onCompleted();

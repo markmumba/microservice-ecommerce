@@ -1,0 +1,25 @@
+input CategoryInput {
+    id:ID
+    name:String!
+    description:String!
+}
+
+type CategoryList {
+    id:ID!
+    name:String!
+
+}
+
+type Category{
+    id:ID
+    name:String
+    description:String
+    products: [ProductItem]
+}
+
+type ProductItem {
+    id:ID
+    name:String
+    price:String
+}
+

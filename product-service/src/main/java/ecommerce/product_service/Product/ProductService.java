@@ -1,7 +1,6 @@
 package ecommerce.product_service.Product;
 
 
-import ecommerce.product_service.Product.dto.ProductRequestDto;
 import ecommerce.proto_service.grpc.product.ProductItem;
 import ecommerce.proto_service.grpc.product.ProductRequest;
 import ecommerce.proto_service.grpc.product.ProductResponse;

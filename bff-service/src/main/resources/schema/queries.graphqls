@@ -1,0 +1,14 @@
+
+
+type  Query {
+
+    # category requests
+    getAllCategories:[CategoryList]
+    getCategoryById(id:String):Category
+
+    # product requests
+    getAllProducts: [Product]
+    getProductById(id:String):Product
+
+}
+
