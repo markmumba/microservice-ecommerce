@@ -9,6 +9,6 @@ import org.springframework.grpc.client.GrpcChannelFactory;
 public class ProductGrpcClient {
     @Bean
     ProductServiceGrpc.ProductServiceStub stub (GrpcChannelFactory channels) {
-        return ProductServiceGrpc.newStub(channels.createChannel("product-service"));
+        return ProductServiceGrpc.newStub(channels.createChannel("product_service"));
     }
 }

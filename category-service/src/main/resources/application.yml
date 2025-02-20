@@ -6,10 +6,10 @@ spring:
       uri: ${DATABASE_URI:mongodb://localhost:27019/category}
   grpc:
     server:
-      port: ${PORT:9092}
+      port: ${GRPC_PORT:9092}
     client:
       channels:
-        product-service:
+        product_service:
           address: ${PRODUCT_SERVICE_URL:localhost:9091}
           negotiation-type: PLAINTEXT
 

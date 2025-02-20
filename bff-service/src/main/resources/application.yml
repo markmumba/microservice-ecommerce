@@ -7,12 +7,14 @@ spring:
   grpc:
     client:
       channels:
-        product-service:
+        product_service:
           address: ${PRODUCT_SERVICE_ADDRESS:localhost:9091}
           negotiation-type: PLAINTEXT
-        category-service:
+        category_service:
           address: ${CATEGORY_SERVICE_ADDRESS:localhost:9092}
           negotiation-type: PLAINTEXT
+    server:
+      port: ${GRPC_PORT:9093}
 
-
-
+server:
+  port: ${SERVER_PORT:8081}

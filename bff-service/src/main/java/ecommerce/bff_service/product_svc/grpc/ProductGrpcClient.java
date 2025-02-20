@@ -10,12 +10,12 @@ import org.springframework.stereotype.Service;
 public class ProductGrpcClient {
     @Bean
     ProductServiceGrpc.ProductServiceStub asyncStub (GrpcChannelFactory channels) {
-        return ProductServiceGrpc.newStub(channels.createChannel("product-service"));
+        return ProductServiceGrpc.newStub(channels.createChannel("product_service"));
     }
 
     @Bean
     ProductServiceGrpc.ProductServiceBlockingStub stub (GrpcChannelFactory channels) {
-        return ProductServiceGrpc.newBlockingStub(channels.createChannel("product-service"));
+        return ProductServiceGrpc.newBlockingStub(channels.createChannel("product_service"));
     }
 
 
