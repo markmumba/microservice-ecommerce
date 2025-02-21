@@ -1,23 +1,21 @@
 services:
-  category-service:
+  order_service:
     build: .
     ports:
-      - "9092:9092"
+      - "${GRPC_PORT:-9094}:{GRPC_PORT:-9094}"
     environment:
       DATABASE_URI: ${DOCKER_DATABASE_URI}
     depends_on:
-      - mongodb
+      - mongo-db
     profiles:
       - with-backend
 
-
-  mongodb:
-    container_name: category-db
+  mongo_db:
     image: mongo:latest
     volumes:
       - dbdata6:/data/db
     ports:
-      - "27019:27017"
+      - "27020:27017"
 
 volumes:
-  dbdata6:
+  db-data:
