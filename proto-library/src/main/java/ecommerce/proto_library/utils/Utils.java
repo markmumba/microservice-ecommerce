@@ -1,4 +1,4 @@
-package ecommerce.product_service.Product.utils;
+package ecommerce.proto_library.utils;
 
 import java.security.SecureRandom;
 

@@ -1,41 +1,71 @@
 syntax = "proto3";
 
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+option java_multiple_files = true;
+option java_package = "ecommerce.proto_service.grpc.order";
+option java_outer_classname = "OrderProto";
 
 service OrderService {
-    rpc CreateOrder(CreateOrderRequest) returns (OrderResponse);
-    rpc GetOrder(GetOrderRequest) returns (Order);
-    rpc ListOrders(ListOrdersRequest) returns (ListOrdersResponse);
+
+  rpc createOrder(CreateOrderRequest) returns (OrderResponse);
+  rpc getOrderById(OrderId) returns (Order);
+  rpc getAllOrders(google.protobuf.Empty) returns (stream ListOrdersResponse);
+  rpc getOrderByUser(UserId) returns(stream ListOrdersResponse);
+  rpc getOrdersByCode(OrderCode) returns(stream ListOrdersResponse);
+  rpc getOrdersByDateRange(DateRange) returns (stream ListOrdersResponse);
+  rpc updateOrder(UpdateOrder) returns (OrderResponse);
+  rpc deleteOrder(OrderId) returns (OrderResponse);
+
 }
 
-message Order {
-    string id = 1;
-    string productId = 2;
-    string orderCode = 3;
-    double totalAmount = 4;
-    int32 quantity = 5;
-    google.protobuf.Timestamp orderDate = 6;
+message OrderId {
+  string id = 1;
+}
+
+message UserId{
+  string id = 1;
+}
+
+message OrderCode {
+  string code = 1;
+}
+
+message DateRange {
+  google.protobuf.Timestamp startDate = 1;
+  google.protobuf.Timestamp endDate = 2;
+}
+
+message ProductOrder {
+  string productId = 1;
+  int32 quantity = 2;
 }
 
 message CreateOrderRequest {
-    string productId = 1;
-    int32 quantity = 2;
+  repeated ProductOrder products = 1;
 }
+
+message UpdateOrder {
+  string id = 1;
+  repeated ProductOrder products = 2;
+}
+
+message Order {
+  string id = 1;
+  repeated ProductOrder products = 2;
+  string orderCode = 3;
+  double totalAmount = 4;
+  google.protobuf.Timestamp orderDate = 5;
+  google.protobuf.Timestamp updateTime =6;
+
+}
+
 
 message OrderResponse {
-    string message = 1;
-    string orderId = 2;
+  string message = 1;
+  string orderId = 2;
 }
-
-message GetOrderRequest {
-    string id = 1;
-}
-
-message ListOrdersRequest {
-    int32 page = 1;
-    int32 pageSize = 2;
-}
-
 message ListOrdersResponse {
-    repeated Order orders = 1;
+  repeated Order orders = 1;
 }

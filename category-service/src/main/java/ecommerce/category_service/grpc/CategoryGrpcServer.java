@@ -13,7 +13,7 @@ import java.util.List;
 
 @GrpcService
 @AllArgsConstructor
-public class CategoryGRPCServer extends CategoryServiceGrpc.CategoryServiceImplBase {
+public class CategoryGrpcServer extends CategoryServiceGrpc.CategoryServiceImplBase {
 
     private final CategoryService categoryService;
 

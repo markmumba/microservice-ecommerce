@@ -21,6 +21,7 @@ configurations {
 }
 
 repositories {
+	mavenLocal()
 	mavenCentral()
 }
 
@@ -29,6 +30,7 @@ ext {
 }
 
 dependencies {
+	implementation 'ecommerce:proto-library:0.0.1-SNAPSHOT'
 	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 	implementation 'io.grpc:grpc-services'
 	implementation 'org.springframework.grpc:spring-grpc-spring-boot-starter'

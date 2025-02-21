@@ -4,7 +4,7 @@ import ecommerce.product_service.Product.Product;
 import ecommerce.product_service.Product.ProductRepository;
 import ecommerce.product_service.Product.ProductService;
 import ecommerce.product_service.Product.dto.ProductMapper;
-import ecommerce.product_service.Product.utils.Utils;
+import ecommerce.proto_library.utils.Utils;
 import ecommerce.proto_service.grpc.product.ProductItem;
 import ecommerce.proto_service.grpc.product.ProductRequest;
 import ecommerce.proto_service.grpc.product.ProductResponse;

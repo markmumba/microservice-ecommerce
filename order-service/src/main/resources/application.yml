@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: order-service
+  data:
+    mongodb:
+      uri: ${DATABASE_URI:mongodb://localhost:27020/order}
+  grpc:
+    server:
+      port: ${GRPC_PORT:9094}
+    client:
+      channels:
+        product_service:
+          address: ${PRODUCT_SERVICE_URL:localhost:9091}
+          negotiation-type: PLAINTEXT
+
