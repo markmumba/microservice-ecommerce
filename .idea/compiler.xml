@@ -12,6 +12,9 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="inventory-service" target="17" />
+      <module name="inventory-service.main" target="17" />
+      <module name="inventory-service.test" target="17" />
       <module name="proto-service.main" target="17" />
       <module name="proto-service.test" target="17" />
     </bytecodeTargetLevel>

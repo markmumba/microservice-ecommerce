@@ -88,15 +88,6 @@ public class OrderGrpcServer extends OrderServiceGrpc.OrderServiceImplBase {
     @Override
     public void getOrdersByDateRange(DateRange request, StreamObserver<ListOrdersResponse> responseObserver) {
         try {
-            // Validate date range
-            if (request.getStartDate() == null || request.getEndDate() == null) {
-                responseObserver.onError(
-                        Status.INVALID_ARGUMENT.withDescription(
-                                        "Both start date and end date are required")
-                                .asRuntimeException()
-                );
-                return;
-            }
 
             ListOrdersResponse response = orderService.getAllOrdersByDateRange(request);
             responseObserver.onNext(response);
