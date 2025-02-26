@@ -1,5 +1,6 @@
 package ecommerce.order_service.order.impl;
 
+import com.google.protobuf.Timestamp;
 import ecommerce.order_service.OrderService;
 import ecommerce.order_service.order.Order;
 import ecommerce.order_service.order.OrderRepository;
@@ -15,7 +16,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -134,7 +137,26 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public ListOrdersResponse getAllOrdersByDateRange(DateRange dateRange) {
-        return null;
+
+        LocalDateTime startDate = Instant.ofEpochSecond(
+                dateRange.getStartDate().getSeconds(),
+                dateRange.getStartDate().getNanos()
+        ).atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+        LocalDateTime endDate = Instant.ofEpochSecond(
+                dateRange.getEndDate().getSeconds(),
+                dateRange.getEndDate().getNanos()
+        ).atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+        List< ecommerce.proto_service.grpc.order.Order> orders =
+                orderRepository.findByOrderDateBetween(startDate,endDate)
+                        .stream()
+                        .map(orderMapper::toDto)
+                        .toList();
+
+        return ListOrdersResponse.newBuilder()
+                .addAllOrders(orders)
+                .build();
     }
 
 
