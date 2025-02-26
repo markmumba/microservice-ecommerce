@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+
+option java_multiple_files = true;
+option java_package = "ecommerce.proto_service.grpc.inventory";
+option java_outer_classname = "InventoryProto";
+
+
+service  InventoryService {
+  rpc addItemInventory(InventoryRequest) returns (InventoryResponse);
+  rpc getAllItemsInventory(google.protobuf.Empty) returns (stream InventoryList);
+  rpc getItemInventoryById (InventoryId) returns (Inventory);
+  rpc updateItemInventory (UpdateInventory) returns (InventoryResponse);
+  rpc deleteItemInventory (InventoryId ) returns (InventoryResponse);
+}
+
+message InventoryId {
+  string id = 1;
+}
+message InventoryRequest {
+  string productId = 1;
+  int32  quantity = 2;
+}
+
+message InventoryProductItem {
+  string id = 1;
+  string name = 2;
+  string price = 3;
+}
+
+message UpdateInventory {
+  string id = 1;
+  string productId = 2;
+  string quantity = 3;
+}
+
+
+
+message Inventory {
+  string id = 1;
+  InventoryProductItem product = 2;
+  int32 quantity = 3 ;
+  int32 reserved = 4;
+  google.protobuf.Timestamp updateTime = 5;
+}
+
+
+message InventoryResponse {
+  string id = 1;
+  string message = 2;
+}
+
+
+
+message InventoryList {
+  repeated Inventory items = 1;
+}
