@@ -11,4 +11,8 @@ public class ProductGrpcClient {
     ProductServiceGrpc.ProductServiceBlockingStub productStub (GrpcChannelFactory channel) {
         return ProductServiceGrpc.newBlockingStub(channel.createChannel("product_service"));
     }
+    @Bean
+    ProductServiceGrpc.ProductServiceStub asyncProductStub (GrpcChannelFactory channel) {
+        return ProductServiceGrpc.newStub(channel.createChannel("product_service"));
+    }
 }

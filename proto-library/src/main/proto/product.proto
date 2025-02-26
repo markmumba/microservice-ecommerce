@@ -16,6 +16,8 @@ service ProductService {
 
   rpc getProductById(ProductId) returns (ProductResponse){}
 
+  rpc getProductByIds(ProductIdsList) returns (stream ProductListResponse);
+
   rpc updateProduct(UpdateRequest) returns (MessageResponse) {}
 
   rpc deleteProduct(ProductId) returns (MessageResponse){}
@@ -25,6 +27,10 @@ message Empty {}
 
 message ProductId {
   string id = 1 ;
+}
+
+message ProductIdsList{
+  repeated  string id=1;
 }
 
 message ProductCategoryId {

@@ -5,10 +5,7 @@ import ecommerce.product_service.Product.ProductRepository;
 import ecommerce.product_service.Product.ProductService;
 import ecommerce.product_service.Product.dto.ProductMapper;
 import ecommerce.proto_library.utils.Utils;
-import ecommerce.proto_service.grpc.product.ProductItem;
-import ecommerce.proto_service.grpc.product.ProductRequest;
-import ecommerce.proto_service.grpc.product.ProductResponse;
-import ecommerce.proto_service.grpc.product.UpdateRequest;
+import ecommerce.proto_service.grpc.product.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -43,6 +40,15 @@ public class ProductServiceImpl implements ProductService {
                 () -> new IllegalArgumentException("Error finding product of id " + id)
         );
         return productMapper.fromEntity(product);
+    }
+
+    @Override
+    public List<ProductItem> getProductsByIds(ProductIdsList request) {
+        List<String> productIds= request.getIdList();
+        return productRepository.findAllById(productIds)
+               .stream()
+                .map(productMapper::fromEntityList)
+                .toList();
     }
 
     @Override

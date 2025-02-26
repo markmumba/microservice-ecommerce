@@ -42,6 +42,17 @@ message ProductOrder {
   int32 quantity = 2;
 }
 
+message OrderProductItem{
+  string id = 1;
+  string name = 2;
+  string price = 3;
+}
+
+message ProductOrderResponse {
+  OrderProductItem product = 1;
+  int32  quantity = 2;
+}
+
 message CreateOrderRequest {
   repeated ProductOrder products = 1;
 }
@@ -53,15 +64,13 @@ message UpdateOrder {
 
 message Order {
   string id = 1;
-  repeated ProductOrder products = 2;
+  repeated ProductOrderResponse products = 2;
   string orderCode = 3;
   double totalAmount = 4;
   google.protobuf.Timestamp orderDate = 5;
-  google.protobuf.Timestamp updateTime =6;
+  google.protobuf.Timestamp updateTime = 6;
 
 }
-
-
 message OrderResponse {
   string message = 1;
   string orderId = 2;

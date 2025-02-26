@@ -81,6 +81,17 @@ public class ProductGRPCServer extends ProductServiceGrpc.ProductServiceImplBase
     }
 
     @Override
+    public void getProductByIds(ProductIdsList request, StreamObserver<ProductListResponse> responseObserver) {
+        List<ProductItem> productItems = productService.getProductsByIds(request);
+        ProductListResponse response = ProductListResponse.newBuilder()
+                .addAllProducts(productItems)
+                .build();
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
+    @Override
     public void updateProduct(UpdateRequest request, StreamObserver<MessageResponse> responseObserver) {
         String response =  productService.updateProduct(request.getId(),request);
        MessageResponse messageResponse = MessageResponse.newBuilder()

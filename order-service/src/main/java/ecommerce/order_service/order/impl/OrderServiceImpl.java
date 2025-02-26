@@ -8,9 +8,8 @@ import ecommerce.order_service.order.ProductOrder;
 import ecommerce.order_service.order.dto.OrderMapper;
 import ecommerce.proto_library.utils.Utils;
 import ecommerce.proto_service.grpc.order.*;
-import ecommerce.proto_service.grpc.product.ProductId;
-import ecommerce.proto_service.grpc.product.ProductResponse;
-import ecommerce.proto_service.grpc.product.ProductServiceGrpc;
+import ecommerce.proto_service.grpc.product.*;
+import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,9 +18,9 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -37,6 +36,8 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final OrderMapper orderMapper;
     private final ProductServiceGrpc.ProductServiceBlockingStub productClient;
+    private final ProductServiceGrpc.ProductServiceStub asyncProductClient;
+    private Throwable error;
 
     /**
      * create order uses product id to get price from product service to get total amount
@@ -63,7 +64,7 @@ public class OrderServiceImpl implements OrderService {
                 totalAmount = totalAmount.add(totalPerProduct);
             }
 
-            Order order = orderMapper.requestToEntity(request);
+            Order order = orderMapper.requestToEntityOrder(request);
             order.setTotalAmount(totalAmount);
             order.setOrderDate(time);
             order.setOrderCode(Utils.generateCode(6));
@@ -88,20 +89,87 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
+
     @Override
     public ecommerce.proto_service.grpc.order.Order getOrderById(OrderId id) {
+
         Order order = orderRepository.findById(id.getId()).orElseThrow(
                 () -> new IllegalArgumentException("order of given id not found " + id.getId())
         );
-        return orderMapper.toDto(order);
+
+        ecommerce.proto_service.grpc.order.Order.Builder responseOrderBuilder =
+                orderMapper.fromOrderEntityToDto(order).toBuilder();
+
+        List<ProductItem> productItems = new ArrayList<>();
+
+        List<String> productIds = order.getProducts().stream().map(ProductOrder::getProductId).toList();
+
+        ProductIdsList productIdsList = ProductIdsList.newBuilder()
+                .addAllId(productIds)
+                .build();
+
+        CountDownLatch latch = new CountDownLatch(1);
+
+
+        asyncProductClient.getProductByIds(productIdsList, new StreamObserver<ProductListResponse>() {
+            @Override
+            public void onNext(ProductListResponse value) {
+                productItems.addAll(value.getProductsList());
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                error=t;
+                latch.countDown();
+            }
+
+            @Override
+            public void onCompleted() {
+                latch.countDown();
+            }
+        });
+        try {
+            if (!latch.await(5, TimeUnit.SECONDS)) {
+                throw new RuntimeException("Timeout waiting for product response");
+            }
+            if(error != null) {
+                throw new RuntimeException("Error fetching products", error);
+            }
+
+
+            Map<String, ProductItem> productMap = productItems.stream()
+                    .collect(
+                            Collectors.toMap(ProductItem::getId, productItem -> productItem));
+
+            List<ProductOrderResponse> productResponses = order.getProducts().stream()
+                    .map(product -> {
+                        ProductItem productItem = productMap.get(product.getProductId());
+                        if (productItem == null) {
+                            log.warn("Product not found: {}", product.getProductId());
+                            return null;
+                        }
+                        return orderMapper.mapProductToResponse(productItem,product);
+                    }).filter(Objects::nonNull)
+                    .toList();
+
+
+            responseOrderBuilder.clearProducts();
+            responseOrderBuilder.addAllProducts(productResponses);
+
+        } catch (InterruptedException e) {
+            throw new RuntimeException("Interrupted while waiting for grpc response ", e);
+        }
+
+        return responseOrderBuilder.build();
     }
+
 
     @Override
     public ListOrdersResponse getAllOrders() {
         List<ecommerce.proto_service.grpc.order.Order> orders =
                 orderRepository.findAll()
                         .stream()
-                        .map(orderMapper::toDto)
+                        .map(orderMapper::fromOrderEntityToDto)
                         .toList();
 
         return ListOrdersResponse.newBuilder()
@@ -114,7 +182,7 @@ public class OrderServiceImpl implements OrderService {
         List<ecommerce.proto_service.grpc.order.Order> orders =
                 orderRepository.findAllByUserId(id.getId())
                         .stream()
-                        .map(orderMapper::toDto)
+                        .map(orderMapper::fromOrderEntityToDto)
                         .toList();
 
         return ListOrdersResponse.newBuilder()
@@ -127,7 +195,7 @@ public class OrderServiceImpl implements OrderService {
         List<ecommerce.proto_service.grpc.order.Order> orders =
                 orderRepository.findAllByOrderCode(code.getCode())
                         .stream()
-                        .map(orderMapper::toDto)
+                        .map(orderMapper::fromOrderEntityToDto)
                         .toList();
 
         return ListOrdersResponse.newBuilder()
@@ -148,10 +216,10 @@ public class OrderServiceImpl implements OrderService {
                 dateRange.getEndDate().getNanos()
         ).atZone(ZoneId.systemDefault()).toLocalDateTime();
 
-        List< ecommerce.proto_service.grpc.order.Order> orders =
-                orderRepository.findByOrderDateBetween(startDate,endDate)
+        List<ecommerce.proto_service.grpc.order.Order> orders =
+                orderRepository.findByOrderDateBetween(startDate, endDate)
                         .stream()
-                        .map(orderMapper::toDto)
+                        .map(orderMapper::fromOrderEntityToDto)
                         .toList();
 
         return ListOrdersResponse.newBuilder()
@@ -159,6 +227,18 @@ public class OrderServiceImpl implements OrderService {
                 .build();
     }
 
+    /**
+     * this the update request where we get the existing order
+     * we create a map with the id and the object of the product and quantity
+     * we loop through the new product items check if the id exists in the map ...
+     * if it exists we check the quantity and update with the new quantity
+     * then we calculate the old amount then minus from total then add the new amount
+     * finally we add item if it was not in the list
+     * then we remove the ones not in the new list
+     *
+     * @param request a new order request with new product values
+     * @return return a new object with the id of the order and the message
+     */
 
     @Override
     public OrderResponse updateRequest(UpdateOrder request) {
@@ -195,9 +275,9 @@ public class OrderServiceImpl implements OrderService {
                     totalAmount = totalAmount.subtract(oldTotal).add(newTotal);
                     existingProductOrder.setQuantity(newQuantity);
                 } else {
-                    ProductOrder newProductOrderToSave = orderMapper.toEntityProductOrder(newProductOrder);
+                    ProductOrder newProductOrderToSave = orderMapper.toEntityFromProductOrder(newProductOrder);
                     order.getProducts().add(newProductOrderToSave);
-                    totalAmount = totalAmount.add(calculateTotal(newQuantity,product.getPrice()));
+                    totalAmount = totalAmount.add(calculateTotal(newQuantity, product.getPrice()));
                 }
 
             }
