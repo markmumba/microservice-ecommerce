@@ -1,21 +1,22 @@
+
 services:
-  order_service:
+  inventory_service:
     build: .
     ports:
-      - "${GRPC_PORT:-9094}:{GRPC_PORT:-9094}"
+      - "${GRPC_PORT:-9095}:{GRPC_PORT:-9095}"
     environment:
-      DATABASE_URI: ${DOCKER_DATABASE_URI}
+      DATABASE_URI: ${DOCKER_DATABASE_URL}
     depends_on:
-      - mongo-db
+      - mongo_db
     profiles:
-      - with-backend
+      - with_backend
 
   mongo_db:
     image: mongo:latest
     volumes:
       - dbdata6:/data/db
     ports:
-      - "27020:27017"
+      - "27021:27017"
 
 volumes:
   dbdata6:
