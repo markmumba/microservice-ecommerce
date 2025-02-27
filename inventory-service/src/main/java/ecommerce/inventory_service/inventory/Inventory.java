@@ -1,4 +1,4 @@
-package ecommerce.inventory_service;
+package ecommerce.inventory_service.inventory;
 
 import lombok.Data;
 import org.springframework.data.annotation.Id;

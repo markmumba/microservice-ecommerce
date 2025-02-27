@@ -71,16 +71,20 @@ public class ProductGRPCServer extends ProductServiceGrpc.ProductServiceImplBase
             ProductResponse response = productService.getProductById(request.getId());
             responseObserver.onNext(response);
             responseObserver.onCompleted();
+        } catch (IllegalArgumentException e) {
+            responseObserver.onError(
+                    Status.NOT_FOUND
+                            .withDescription("Product not found: " + e.getMessage())
+                            .asException()
+            );
         } catch (Exception e) {
             responseObserver.onError(
-                    Status.INVALID_ARGUMENT
-                            .withDescription("Error finding product: " + e.getMessage())
+                    Status.INTERNAL
+                            .withDescription("Error processing request: " + e.getMessage())
                             .asException()
             );
         }
-    }
-
-    @Override
+    }    @Override
     public void getProductByIds(ProductIdsList request, StreamObserver<ProductListResponse> responseObserver) {
         List<ProductItem> productItems = productService.getProductsByIds(request);
         ProductListResponse response = ProductListResponse.newBuilder()

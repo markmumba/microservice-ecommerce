@@ -34,7 +34,7 @@ message InventoryProductItem {
 message UpdateInventory {
   string id = 1;
   string productId = 2;
-  string quantity = 3;
+  int32 quantity = 3;
 }
 
 

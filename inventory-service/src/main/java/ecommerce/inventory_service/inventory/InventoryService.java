@@ -1,4 +1,4 @@
-package ecommerce.inventory_service;
+package ecommerce.inventory_service.inventory;
 
 import ecommerce.proto_service.grpc.inventory.InventoryId;
 import ecommerce.proto_service.grpc.inventory.InventoryRequest;

@@ -2,7 +2,7 @@ package ecommerce.order_service.grpc;
 
 
 import com.google.protobuf.Empty;
-import ecommerce.order_service.OrderService;
+import ecommerce.order_service.order.OrderService;
 import ecommerce.proto_service.grpc.order.*;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;

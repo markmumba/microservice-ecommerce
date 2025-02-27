@@ -1,4 +1,4 @@
-package ecommerce.inventory_service;
+package ecommerce.inventory_service.inventory;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 

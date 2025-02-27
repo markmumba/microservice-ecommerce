@@ -1,9 +1,7 @@
-package ecommerce.order_service;
+package ecommerce.order_service.order;
 
 import ecommerce.proto_service.grpc.order.*;
-import ecommerce.proto_service.grpc.product.UpdateRequest;
-
-import java.util.List;
+import ecommerce.proto_service.grpc.order.Order;
 
 public interface OrderService {
     OrderResponse createOrder(CreateOrderRequest request);

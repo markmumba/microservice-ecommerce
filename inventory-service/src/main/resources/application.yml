@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: inventory-service
+
+  data:
+    mongodb:
+      uri: ${DATABASE_URI:mongodb://localhost:27021/inventory}
+
+  grpc:
+    client:
+      channels:
+        product_service:
+          address: ${PRODUCT_SERVICE_URL:localhost:9091}
+          negotiation-type: PLAINTEXT
+    server:
+      port: ${GRPC_PORT:9095}
+

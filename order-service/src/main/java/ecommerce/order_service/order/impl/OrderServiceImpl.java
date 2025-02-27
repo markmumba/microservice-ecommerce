@@ -1,7 +1,6 @@
 package ecommerce.order_service.order.impl;
 
-import com.google.protobuf.Timestamp;
-import ecommerce.order_service.OrderService;
+import ecommerce.order_service.order.OrderService;
 import ecommerce.order_service.order.Order;
 import ecommerce.order_service.order.OrderRepository;
 import ecommerce.order_service.order.ProductOrder;
