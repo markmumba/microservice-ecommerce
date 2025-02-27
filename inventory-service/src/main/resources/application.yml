@@ -12,6 +12,7 @@ spring:
         product_service:
           address: ${PRODUCT_SERVICE_URL:localhost:9091}
           negotiation-type: PLAINTEXT
+          secure: false
     server:
       port: ${GRPC_PORT:9095}
 

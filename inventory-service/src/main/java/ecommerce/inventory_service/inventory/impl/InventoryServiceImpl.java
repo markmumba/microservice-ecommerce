@@ -4,10 +4,7 @@ import ecommerce.inventory_service.inventory.Inventory;
 import ecommerce.inventory_service.inventory.InventoryRepository;
 import ecommerce.inventory_service.inventory.InventoryService;
 import ecommerce.inventory_service.inventory.dto.InventoryMapper;
-import ecommerce.proto_service.grpc.inventory.InventoryId;
-import ecommerce.proto_service.grpc.inventory.InventoryRequest;
-import ecommerce.proto_service.grpc.inventory.InventoryResponse;
-import ecommerce.proto_service.grpc.inventory.UpdateInventory;
+import ecommerce.proto_service.grpc.inventory.*;
 import ecommerce.proto_service.grpc.product.ProductId;
 import ecommerce.proto_service.grpc.product.ProductResponse;
 import ecommerce.proto_service.grpc.product.ProductServiceGrpc;
@@ -72,10 +69,19 @@ public class InventoryServiceImpl implements InventoryService {
     @Override
     public ecommerce.proto_service.grpc.inventory.Inventory getItemInventoryById(InventoryId request) {
         try {
+
             Inventory inventory = inventoryRepository.findById(request.getId()).orElseThrow(
-                    ()-> new NoSuchElementException("Inventory of given id not found")
+                    () -> new NoSuchElementException("Inventory of given id not found")
             );
-            return inventoryMapper.fromEntityToDto(inventory);
+            ProductId productId = ProductId.newBuilder().setId(inventory.getProductId()).build();
+            ecommerce.proto_service.grpc.inventory.Inventory.Builder inventoryBuilder = inventoryMapper.fromEntityToDto(inventory).toBuilder();
+
+            ProductResponse productResponse = productClient.getProductById(productId);
+            InventoryProductItem inventoryProductItem = inventoryMapper.fromProductItemFromProductResponse(productResponse);
+            inventoryBuilder.clearProduct();
+            inventoryBuilder.setProduct(inventoryProductItem);
+
+            return inventoryBuilder.build();
 
         } catch (Exception e) {
             throw new RuntimeException("Error trying to fetch item inventory");
@@ -86,24 +92,23 @@ public class InventoryServiceImpl implements InventoryService {
     public InventoryResponse updateItemInventory(UpdateInventory request) {
         try {
             Inventory inventory = inventoryRepository.findById(request.getId()).orElseThrow(
-                    ()-> new NoSuchElementException("Inventory of given id not found")
+                    () -> new NoSuchElementException("Inventory of given id not found")
             );
             inventory.setQuantity(request.getQuantity());
             inventoryRepository.save(inventory);
 
-            return  InventoryResponse.newBuilder()
+            return InventoryResponse.newBuilder()
                     .setMessage("Quantity updated successfully")
                     .build();
         } catch (Exception e) {
             throw new RuntimeException("Error trying to fetch item inventory");
         }
-
     }
 
     @Override
     public InventoryResponse deleteItemInventory(InventoryId request) {
         Inventory inventory = inventoryRepository.findById(request.getId()).orElseThrow(
-                ()-> new NoSuchElementException("Inventory of given id not found")
+                () -> new NoSuchElementException("Inventory of given id not found")
         );
         inventoryRepository.delete(inventory);
         return InventoryResponse.newBuilder()

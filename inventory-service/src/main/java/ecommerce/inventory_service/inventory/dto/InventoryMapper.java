@@ -2,8 +2,9 @@ package ecommerce.inventory_service.inventory.dto;
 
 import com.google.protobuf.Timestamp;
 import ecommerce.inventory_service.inventory.Inventory;
+import ecommerce.proto_service.grpc.inventory.InventoryProductItem;
 import ecommerce.proto_service.grpc.inventory.InventoryRequest;
-import ecommerce.proto_service.grpc.inventory.InventoryResponse;
+import ecommerce.proto_service.grpc.product.ProductResponse;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -31,6 +32,14 @@ public class InventoryMapper {
                         .setNanos(instant.getNano())
                         .build()
                 )
+                .build();
+    }
+
+    public InventoryProductItem fromProductItemFromProductResponse (ProductResponse productResponse) {
+        return InventoryProductItem.newBuilder()
+                .setId(productResponse.getId())
+                .setName(productResponse.getName())
+                .setPrice(productResponse.getPrice())
                 .build();
     }
 }

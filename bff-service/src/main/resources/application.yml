@@ -10,9 +10,11 @@ spring:
         product_service:
           address: ${PRODUCT_SERVICE_ADDRESS:localhost:9091}
           negotiation-type: PLAINTEXT
+          secure: false
         category_service:
           address: ${CATEGORY_SERVICE_ADDRESS:localhost:9092}
           negotiation-type: PLAINTEXT
+          secure: false
     server:
       port: ${GRPC_PORT:9093}
 

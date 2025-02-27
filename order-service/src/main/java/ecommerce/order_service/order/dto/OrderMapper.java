@@ -15,7 +15,7 @@ import java.time.ZoneOffset;
 @Service
 public class OrderMapper {
 
-    public Order requestToEntityOrder (CreateOrderRequest orderRequest) {
+    public Order requestToEntityOrder(CreateOrderRequest orderRequest) {
         Order order = new Order();
         order.setProducts(
                 orderRequest
@@ -35,17 +35,21 @@ public class OrderMapper {
     }
 
 
-
-    public ecommerce.proto_service.grpc.order.Order fromOrderEntityToDto (Order order){
+    public ecommerce.proto_service.grpc.order.Order fromOrderEntityToDto(Order order) {
         Instant instant = order.getOrderDate().toInstant(ZoneOffset.UTC);
         return ecommerce.proto_service.grpc.order.Order.newBuilder()
                 .setId(order.getId())
                 .setOrderCode(order.getOrderCode())
+                .setTotalAmount(Double.parseDouble(order.getTotalAmount().toString()))
                 .setOrderDate(Timestamp.newBuilder()
                         .setSeconds(instant.getEpochSecond())
                         .setNanos(instant.getNano())
                         .build())
-        .build();
+                .setUpdateTime(Timestamp.newBuilder()
+                        .setSeconds(instant.getEpochSecond())
+                        .setNanos(instant.getNano())
+                        .build())
+                .build();
     }
 
     public ProductOrderResponse mapProductToResponse(ProductItem product, ProductOrder productOrder) {

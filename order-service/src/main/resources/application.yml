@@ -12,4 +12,8 @@ spring:
         product_service:
           address: ${PRODUCT_SERVICE_URL:localhost:9091}
           negotiation-type: PLAINTEXT
+          secure: false
 
+
+  kafka:
+    bootstrap-servers: localhost:9097

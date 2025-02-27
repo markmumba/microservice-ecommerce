@@ -7,8 +7,10 @@ import ecommerce.proto_service.grpc.order.*;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.grpc.server.service.GrpcService;
 
+@Slf4j
 @GrpcService
 @AllArgsConstructor
 public class OrderGrpcServer extends OrderServiceGrpc.OrderServiceImplBase {
@@ -18,6 +20,10 @@ public class OrderGrpcServer extends OrderServiceGrpc.OrderServiceImplBase {
     @Override
     public void createOrder(CreateOrderRequest request, StreamObserver<OrderResponse> responseObserver) {
         try {
+            log.info("*".repeat(30));
+            log.info("This is what we get for the request ");
+            log.info(request.toString());
+            log.info("*".repeat(30));
             OrderResponse response = orderService.createOrder(request);
             responseObserver.onNext(response);
             responseObserver.onCompleted();

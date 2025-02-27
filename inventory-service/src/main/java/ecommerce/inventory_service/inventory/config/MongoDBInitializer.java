@@ -17,7 +17,6 @@ public class MongoDBInitializer {
         System.out.println("Dropping all MongoDB collections...");
         mongoTemplate.getDb().drop();
         System.out.println("Database dropped and will be recreated on first insert.");
-
     }
 
 }
