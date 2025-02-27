@@ -1,4 +1,4 @@
-package ecommerce.category_service.Category.config;
+package ecommerce.inventory_service.inventory.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;

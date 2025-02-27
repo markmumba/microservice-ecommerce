@@ -1,4 +1,4 @@
-package ecommerce.category_service.Category.config;
+package ecommerce.order_service.order.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;

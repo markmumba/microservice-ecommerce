@@ -3,9 +3,9 @@ services:
   inventory_service:
     build: .
     ports:
-      - "${GRPC_PORT:-9095}:{GRPC_PORT:-9095}"
+      - "9095:9095"
     environment:
-      DATABASE_URI: ${DOCKER_DATABASE_URL}
+      DATABASE_URI: ${DOCKER_DATABASE_URI}
     depends_on:
       - mongo_db
     profiles:

@@ -2,7 +2,7 @@ services:
   order_service:
     build: .
     ports:
-      - "${GRPC_PORT:-9094}:{GRPC_PORT:-9094}"
+      - "9094:9094"
     environment:
       DATABASE_URI: ${DOCKER_DATABASE_URI}
     depends_on:
