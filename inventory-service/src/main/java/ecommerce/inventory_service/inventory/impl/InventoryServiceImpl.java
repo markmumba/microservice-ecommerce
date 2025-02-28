@@ -33,8 +33,6 @@ public class InventoryServiceImpl implements InventoryService {
     private final InventoryRepository inventoryRepository;
     private final InventoryMapper inventoryMapper;
     private final ProductServiceGrpc.ProductServiceBlockingStub productClient;
-    private final ObjectMapper objectMapper;
-    private final InventoryProducer inventoryProducerService;
 
 
     @Override
@@ -124,30 +122,17 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    public void updateItemsInventoryFromOrder(Order order) throws JsonProcessingException {
-        Map<String,String> response = new HashMap<>();
+    public void updateItemsInventoryFromOrder(Order order)  {
 
         Map<String, Inventory> inventoryMap = inventoryRepository.findAll().stream()
                 .collect(Collectors.toMap(Inventory::getId, inventory -> inventory));
 
         for (ProductOrder product : order.getProducts()) {
             Inventory inventory = inventoryMap.get(product.getProductId());
-            if (product.getQuantity() <= inventory.getQuantity()) {
-
-                Integer result = inventory.getQuantity() - product.getQuantity();
-                inventory.setReserved(product.getQuantity());
-                inventory.setQuantity(result);
-                inventoryRepository.save(inventory);
-
-                response.put("product","Order can be fulfilled successfully");
-                String responseString= objectMapper.writeValueAsString(response);
-                inventoryProducerService.inventoryResponseOrder(responseString);
-
-            } else {
-                response.put(product.toString(),"Cannot fulfill order inventory not available");
-                String responseString= objectMapper.writeValueAsString(response);
-                inventoryProducerService.inventoryResponseOrder(responseString);
-            }
+            Integer result = inventory.getQuantity() - product.getQuantity();
+            inventory.setReserved(product.getQuantity());
+            inventory.setQuantity(result);
+            inventoryRepository.save(inventory);
         }
     }
 
