@@ -1,7 +1,5 @@
 package ecommerce.inventory_service.inventory.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import ecommerce.inventory_service.inventory.Inventory;
 import ecommerce.inventory_service.inventory.InventoryRepository;
 import ecommerce.inventory_service.inventory.InventoryService;
@@ -19,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
