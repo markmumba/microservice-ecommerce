@@ -3,18 +3,30 @@ spring:
   application:
     name: bff-service
 
-
   grpc:
     client:
       channels:
+
         product_service:
           address: ${PRODUCT_SERVICE_ADDRESS:localhost:9091}
           negotiation-type: PLAINTEXT
           secure: false
+
         category_service:
           address: ${CATEGORY_SERVICE_ADDRESS:localhost:9092}
           negotiation-type: PLAINTEXT
           secure: false
+
+        order_service:
+          address: ${ORDER_SERVICE_ADDRESS:localhost:9094}
+          negotiation-type: PLAINTEXT
+          secure: false
+
+        inventory_service:
+          address: ${ORDER_SERVICE_ADDRESS:localhost:9095}
+          negotiation-type: PLAINTEXT
+          secure: false
+
     server:
       port: ${GRPC_PORT:9093}
 

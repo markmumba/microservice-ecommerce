@@ -1,11 +1,18 @@
 
 type Mutation {
+
     # category mutations
     createCategory(input:CategoryInput):Category
     updateCategory(input:CategoryInput):String
     deleteCategory(id:String):String
+
     #product mutations
     createProduct(input:ProductInput):Product
     updateProduct(input:ProductInput):String
     deleteProduct(id:String):String
+
+    #order mutations
+    createOrder(input: CreateOrderInput!): OrderResponse!
+    updateOrder(input: UpdateOrderInput!): OrderResponse!
+    deleteOrder(id: ID!): OrderResponse!
 }

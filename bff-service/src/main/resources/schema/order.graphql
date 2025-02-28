@@ -1,0 +1,53 @@
+scalar Timestamp
+
+
+input DateRangeInput {
+    startDate: Timestamp!
+    endDate: Timestamp!
+}
+
+input ProductOrderInput {
+    productId: ID!
+    quantity: Int!
+}
+
+type OrderProductItem {
+    id: ID!
+    name: String!
+    price: String!
+}
+
+type ProductOrderResponse {
+    product: OrderProductItem!
+    quantity: Int!
+}
+
+# Create Order Request
+input CreateOrderInput {
+    products: [ProductOrderInput!]!
+}
+
+input UpdateOrderInput {
+    id: ID!
+    products: [ProductOrderInput!]!
+}
+
+type Order {
+    id: ID!
+    products: [ProductOrderResponse!]!
+    orderCode: String!
+    totalAmount: Float!
+    orderDate: Timestamp!
+    updateTime: Timestamp!
+}
+
+type OrderResponse {
+    message: String!
+    orderId: ID!
+}
+
+type ListOrdersResponse {
+    orders: [Order!]!
+}
+
+

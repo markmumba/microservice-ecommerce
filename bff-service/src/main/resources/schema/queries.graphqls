@@ -10,5 +10,12 @@ type  Query {
     getAllProducts: [Product]
     getProductById(id:String):Product
 
+    # order requests
+    getOrderById(id: ID!): Order
+    getAllOrders: [Order!]
+    getOrdersByUser(userId: ID!): [Order!]
+    getOrdersByCode(orderCode: String!): [Order!]
+    getOrdersByDateRange(input: DateRangeInput!): [Order!]
+
 }
 
