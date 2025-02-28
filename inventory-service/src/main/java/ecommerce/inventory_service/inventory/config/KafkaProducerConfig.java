@@ -1,6 +1,5 @@
-package ecommerce.order_service.order.config;
+package ecommerce.inventory_service.inventory.config;
 
-import ecommerce.order_service.order.Order;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,33 +8,33 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
-import org.springframework.kafka.support.serializer.JsonSerializer;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
-public class OrderProducerConfig {
-    @Value("${spring.kafka.bootstrap-servers}")
-    private String bootStrapServers;
+public class KafkaProducerConfig {
 
-    public Map<String, Object> producerConfig() {
-        Map<String, Object> props = new HashMap<>();
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootStrapServers);
-        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        return props;
+
+    @Value("${spring.kafka.bootstrap-servers}")
+    private  String bootStrapServer;
+
+    public Map<String,Object> producerConfig () {
+       Map<String,Object> producerMap = new HashMap<>();
+       producerMap.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,bootStrapServer);
+       producerMap.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+       producerMap.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,StringSerializer.class);
+       return producerMap;
     }
 
     @Bean
-    public ProducerFactory<String, String> producerFactory() {
+    public ProducerFactory<String,String> producerFactory (){
         return new DefaultKafkaProducerFactory<>(producerConfig());
     }
 
     @Bean
     public KafkaTemplate<String,String> kafkaTemplate (
-            ProducerFactory<String,String> producerFactory
-    ) {
+            ProducerFactory<String,String> producerFactory) {
         return new KafkaTemplate<>(producerFactory);
     }
 }

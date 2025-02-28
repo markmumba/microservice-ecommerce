@@ -2,6 +2,7 @@ package ecommerce.order_service.order.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.google.protobuf.Timestamp;
 import ecommerce.order_service.order.OrderService;
 import ecommerce.order_service.order.Order;
 import ecommerce.order_service.order.OrderRepository;
@@ -55,10 +56,7 @@ public class OrderServiceImpl implements OrderService {
 
         try {
             LocalDateTime time = LocalDateTime.now();
-
-            // Problem: BigDecimal is initialized with an empty string
             BigDecimal totalAmount = BigDecimal.ZERO;
-
             for (ecommerce.proto_service.grpc.order.ProductOrder productItem : request.getProductsList()) {
                 ProductId productId = ProductId.newBuilder().setId(productItem.getProductId()).build();
 
@@ -106,21 +104,15 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findById(id.getId()).orElseThrow(
                 () -> new IllegalArgumentException("order of given id not found " + id.getId())
         );
-
         ecommerce.proto_service.grpc.order.Order.Builder responseOrderBuilder =
                 orderMapper.fromOrderEntityToDto(order).toBuilder();
-
         List<ProductItem> productItems = new ArrayList<>();
-
         List<String> productIds = order.getProducts().stream().map(ProductOrder::getProductId).toList();
-
         ProductIdsList productIdsList = ProductIdsList.newBuilder()
                 .addAllId(productIds)
                 .build();
 
         CountDownLatch latch = new CountDownLatch(1);
-
-
         asyncProductClient.getProductByIds(productIdsList, new StreamObserver<ProductListResponse>() {
             @Override
             public void onNext(ProductListResponse value) {
@@ -145,8 +137,6 @@ public class OrderServiceImpl implements OrderService {
             if(error != null) {
                 throw new RuntimeException("Error fetching products", error);
             }
-
-
             Map<String, ProductItem> productMap = productItems.stream()
                     .collect(
                             Collectors.toMap(ProductItem::getId, productItem -> productItem));
@@ -216,16 +206,8 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public ListOrdersResponse getAllOrdersByDateRange(DateRange dateRange) {
 
-        LocalDateTime startDate = Instant.ofEpochSecond(
-                dateRange.getStartDate().getSeconds(),
-                dateRange.getStartDate().getNanos()
-        ).atZone(ZoneId.systemDefault()).toLocalDateTime();
-
-        LocalDateTime endDate = Instant.ofEpochSecond(
-                dateRange.getEndDate().getSeconds(),
-                dateRange.getEndDate().getNanos()
-        ).atZone(ZoneId.systemDefault()).toLocalDateTime();
-
+        LocalDateTime startDate = timeStampToLocal(dateRange.getStartDate());
+        LocalDateTime endDate = timeStampToLocal(dateRange.getEndDate());
         List<ecommerce.proto_service.grpc.order.Order> orders =
                 orderRepository.findByOrderDateBetween(startDate, endDate)
                         .stream()
@@ -236,6 +218,14 @@ public class OrderServiceImpl implements OrderService {
                 .addAllOrders(orders)
                 .build();
     }
+
+    private LocalDateTime timeStampToLocal (Timestamp timestamp) {
+       return  Instant.ofEpochSecond(
+                timestamp.getSeconds(),
+                timestamp.getNanos()
+        ).atZone(ZoneId.systemDefault()).toLocalDateTime();
+    }
+
 
     /**
      * this the update request where we get the existing order

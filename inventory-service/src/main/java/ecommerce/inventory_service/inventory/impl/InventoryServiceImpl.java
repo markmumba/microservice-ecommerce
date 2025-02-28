@@ -1,9 +1,13 @@
 package ecommerce.inventory_service.inventory.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import ecommerce.inventory_service.inventory.Inventory;
 import ecommerce.inventory_service.inventory.InventoryRepository;
 import ecommerce.inventory_service.inventory.InventoryService;
 import ecommerce.inventory_service.inventory.dto.InventoryMapper;
+import ecommerce.inventory_service.inventory.dto.external.Order;
+import ecommerce.inventory_service.inventory.dto.external.ProductOrder;
 import ecommerce.proto_service.grpc.inventory.*;
 import ecommerce.proto_service.grpc.product.ProductId;
 import ecommerce.proto_service.grpc.product.ProductResponse;
@@ -15,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -28,6 +33,8 @@ public class InventoryServiceImpl implements InventoryService {
     private final InventoryRepository inventoryRepository;
     private final InventoryMapper inventoryMapper;
     private final ProductServiceGrpc.ProductServiceBlockingStub productClient;
+    private final ObjectMapper objectMapper;
+    private final InventoryProducer inventoryProducerService;
 
 
     @Override
@@ -114,6 +121,34 @@ public class InventoryServiceImpl implements InventoryService {
         return InventoryResponse.newBuilder()
                 .setMessage("Item Inventory deleted successfully")
                 .build();
+    }
+
+    @Override
+    public void updateItemsInventoryFromOrder(Order order) throws JsonProcessingException {
+        Map<String,String> response = new HashMap<>();
+
+        Map<String, Inventory> inventoryMap = inventoryRepository.findAll().stream()
+                .collect(Collectors.toMap(Inventory::getId, inventory -> inventory));
+
+        for (ProductOrder product : order.getProducts()) {
+            Inventory inventory = inventoryMap.get(product.getProductId());
+            if (product.getQuantity() <= inventory.getQuantity()) {
+
+                Integer result = inventory.getQuantity() - product.getQuantity();
+                inventory.setReserved(product.getQuantity());
+                inventory.setQuantity(result);
+                inventoryRepository.save(inventory);
+
+                response.put("product","Order can be fulfilled successfully");
+                String responseString= objectMapper.writeValueAsString(response);
+                inventoryProducerService.inventoryResponseOrder(responseString);
+
+            } else {
+                response.put(product.toString(),"Cannot fulfill order inventory not available");
+                String responseString= objectMapper.writeValueAsString(response);
+                inventoryProducerService.inventoryResponseOrder(responseString);
+            }
+        }
     }
 
 }
