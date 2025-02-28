@@ -30,10 +30,16 @@ ext {
 }
 
 dependencies {
+
 	implementation 'ecommerce:proto-library:0.0.1-SNAPSHOT'
 	implementation 'org.springframework.kafka:spring-kafka'
 	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 	implementation 'io.grpc:grpc-services'
+
+	implementation 'com.fasterxml.jackson.core:jackson-databind:2.18.2'
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.2'
+	implementation 'com.fasterxml.jackson.core:jackson-core:2.18.2'
+
 	implementation 'org.springframework.grpc:spring-grpc-spring-boot-starter'
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'

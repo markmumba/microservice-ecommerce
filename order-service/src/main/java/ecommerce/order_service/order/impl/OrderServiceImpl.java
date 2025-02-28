@@ -1,5 +1,7 @@
 package ecommerce.order_service.order.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import ecommerce.order_service.order.OrderService;
 import ecommerce.order_service.order.Order;
 import ecommerce.order_service.order.OrderRepository;
@@ -11,6 +13,7 @@ import ecommerce.proto_service.grpc.product.*;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -36,6 +39,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderMapper orderMapper;
     private final ProductServiceGrpc.ProductServiceBlockingStub productClient;
     private final ProductServiceGrpc.ProductServiceStub asyncProductClient;
+    private final ObjectMapper objectMapper;
     private final OrderProducer orderProducer;
     private Throwable error;
 
@@ -48,57 +52,38 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderResponse createOrder(CreateOrderRequest request) {
-        log.info("Starting order creation with request: {}", request);
 
         try {
             LocalDateTime time = LocalDateTime.now();
-            log.info("Order timestamp: {}", time);
 
             // Problem: BigDecimal is initialized with an empty string
             BigDecimal totalAmount = BigDecimal.ZERO;
-            log.debug("Initial totalAmount set");
 
-            log.info("Processing {} products from request", request.getProductsCount());
             for (ecommerce.proto_service.grpc.order.ProductOrder productItem : request.getProductsList()) {
                 ProductId productId = ProductId.newBuilder().setId(productItem.getProductId()).build();
-                log.debug("Requesting product with ID: {}", productId.getId());
 
                 ProductResponse product = productClient.getProductById(productId);
                 if (product == null) {
-                    log.error("Product not found for ID: {}", productId.getId());
                     throw new IllegalArgumentException("Product not found for ID: " + productId.getId());
                 }
-                log.debug("Retrieved product: {}", product);
-
                 BigDecimal totalPerProduct = calculateTotal(productItem.getQuantity(), product.getPrice());
-                log.debug("Total for product {}: {}", productId.getId(), totalPerProduct);
-
                 totalAmount = totalAmount.add(totalPerProduct);
-                log.debug("Running total after adding product {}: {}", productId.getId(), totalAmount);
             }
 
-            log.info("Mapping request to Order entity");
             Order order = orderMapper.requestToEntityOrder(request);
             order.setTotalAmount(totalAmount);
             order.setOrderDate(time);
 
             String orderCode = Utils.generateCode(6);
-            log.debug("Generated order code: {}", orderCode);
             order.setOrderCode(orderCode);
 
-            log.info("Saving order to repository");
             Order savedOrder = orderRepository.save(order);
-            log.info("Order saved with ID: {}", savedOrder.getId());
+            orderProducer.sendCreatedOrder(objectMapper.writeValueAsString(savedOrder));
 
-            log.info("Sending created order to message queue");
-            orderProducer.sendCreatedOrder(savedOrder.toString());
-
-            OrderResponse response = OrderResponse.newBuilder()
+            return OrderResponse.newBuilder()
                     .setOrderId(savedOrder.getId())
                     .setMessage("Order created successfully")
                     .build();
-            log.info("Returning order response: {}", response);
-            return response;
 
         } catch (Exception e) {
             log.error("Error creating order", e);
