@@ -1,0 +1,36 @@
+
+input InventoryInput {
+    productId: String!
+    quantity: Int!
+}
+
+input UpdateInventoryInput {
+    id:ID!
+    productId: String!
+    quantity: Int!
+}
+
+type Inventory {
+    id: ID!
+    product: InventoryProductItem!
+    quantity: Int!
+    reserved: Int!
+    updateTime: String! # ISO 8601 formatted timestamp
+}
+
+type InventoryProductItem {
+    id: ID!
+    name: String!
+    price: String!
+}
+
+type InventoryResponse {
+    id: ID!
+    message: String!
+}
+
+type InventoryList {
+    items: [Inventory!]!
+}
+
+

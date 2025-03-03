@@ -17,5 +17,8 @@ type  Query {
     getOrderByCode(orderCode: String!): Order
     getOrdersByDateRange(input: DateRangeInput!): [Order!]
 
+    # inventory requests
+    getAllItemsInventory: [Inventory!]!
+    getItemInventoryById(id: ID!): Inventory
 }
 

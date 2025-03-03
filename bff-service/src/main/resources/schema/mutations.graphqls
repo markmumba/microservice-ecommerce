@@ -15,4 +15,9 @@ type Mutation {
     createOrder(input: CreateOrderInput!): OrderResponse!
     updateOrder(input: UpdateOrderInput!): OrderResponse!
     deleteOrder(id: ID!): OrderResponse!
+
+    #inventory mutations
+    addItemInventory(input: InventoryInput): InventoryResponse!
+    updateItemInventory(input:UpdateInventoryInput): InventoryResponse!
+    deleteItemInventory(id: ID!): InventoryResponse!
 }
