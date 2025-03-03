@@ -106,6 +106,7 @@ public class OrderServiceImpl implements OrderService {
         );
         ecommerce.proto_service.grpc.order.Order.Builder responseOrderBuilder =
                 orderMapper.fromOrderEntityToDto(order).toBuilder();
+
         List<ProductItem> productItems = new ArrayList<>();
         List<String> productIds = order.getProducts().stream().map(ProductOrder::getProductId).toList();
         ProductIdsList productIdsList = ProductIdsList.newBuilder()

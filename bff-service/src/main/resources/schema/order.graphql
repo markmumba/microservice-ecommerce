@@ -11,14 +11,14 @@ input ProductOrderInput {
 }
 
 type OrderProductItem {
-    id: ID!
-    name: String!
-    price: String!
+    id: ID
+    name: String
+    price: String
 }
 
 type ProductOrderResponse {
-    product: OrderProductItem!
-    quantity: Int!
+    product: OrderProductItem
+    quantity: Int
 }
 
 # Create Order Request
@@ -33,7 +33,7 @@ input UpdateOrderInput {
 
 type Order {
     id: ID!
-    products: [ProductOrderResponse!]!
+    products: [ProductOrderResponse]
     orderCode: String!
     totalAmount: Float!
     orderDate: String!

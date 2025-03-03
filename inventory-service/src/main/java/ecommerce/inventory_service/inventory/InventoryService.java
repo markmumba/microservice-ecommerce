@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface InventoryService {
     InventoryResponse addItemInventory(InventoryRequest request) ;
-    List<ecommerce.proto_service.grpc.inventory.Inventory> getAllItemsInventory();
+    List<ecommerce.proto_service.grpc.inventory.Inventory> getAllItemsInventory() throws InterruptedException;
    ecommerce.proto_service.grpc.inventory.Inventory getItemInventoryById (InventoryId request);
     InventoryResponse updateItemInventory (UpdateInventory request);
    InventoryResponse  deleteItemInventory (InventoryId request );
