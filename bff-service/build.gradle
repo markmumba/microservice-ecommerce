@@ -46,7 +46,6 @@ dependencies {
 	annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
 
 	testImplementation 'com.netflix.graphql.dgs:graphql-dgs-spring-graphql-starter-test'
-	testImplementation 'com.netflix.graphql.dgs:graphql-dgs-spring-graphql-starter-test'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.grpc:spring-grpc-test'
 

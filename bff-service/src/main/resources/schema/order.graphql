@@ -1,9 +1,8 @@
-scalar Timestamp
 
 
 input DateRangeInput {
-    startDate: Timestamp!
-    endDate: Timestamp!
+    startDate: String!
+    endDate: String!
 }
 
 input ProductOrderInput {
@@ -37,8 +36,8 @@ type Order {
     products: [ProductOrderResponse!]!
     orderCode: String!
     totalAmount: Float!
-    orderDate: Timestamp!
-    updateTime: Timestamp!
+    orderDate: String!
+    updateTime: String!
 }
 
 type OrderResponse {
