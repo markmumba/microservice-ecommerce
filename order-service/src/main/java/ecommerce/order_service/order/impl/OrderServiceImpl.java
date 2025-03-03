@@ -191,16 +191,71 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public ListOrdersResponse getAllOrdersByCode(OrderCode code) {
-        List<ecommerce.proto_service.grpc.order.Order> orders =
-                orderRepository.findAllByOrderCode(code.getCode())
-                        .stream()
-                        .map(orderMapper::fromOrderEntityToDto)
-                        .toList();
+    public ecommerce.proto_service.grpc.order.Order getOrderByCode(OrderCode code) {
 
-        return ListOrdersResponse.newBuilder()
-                .addAllOrders(orders)
+        Order order = orderRepository.findByOrderCode(code.getCode()).orElseThrow(
+                () -> new NoSuchElementException("order with given code not available")
+        );
+
+        ecommerce.proto_service.grpc.order.Order.Builder responseOrderBuilder =
+                orderMapper.fromOrderEntityToDto(order).toBuilder();
+
+        List<ProductItem> productItems = new ArrayList<>();
+
+        List<String> productIds = order.getProducts().stream().map(ProductOrder::getProductId).toList();
+        ProductIdsList productIdsList = ProductIdsList.newBuilder()
+                .addAllId(productIds)
                 .build();
+
+        CountDownLatch latch = new CountDownLatch(1);
+        asyncProductClient.getProductByIds(productIdsList, new StreamObserver<ProductListResponse>() {
+            @Override
+            public void onNext(ProductListResponse value) {
+                productItems.addAll(value.getProductsList());
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                error=t;
+                latch.countDown();
+            }
+
+            @Override
+            public void onCompleted() {
+                latch.countDown();
+            }
+        });
+        try {
+            if (!latch.await(5, TimeUnit.SECONDS)) {
+                throw new RuntimeException("Timeout waiting for product response");
+            }
+            if(error != null) {
+                throw new RuntimeException("Error fetching products", error);
+            }
+            Map<String, ProductItem> productMap = productItems.stream()
+                    .collect(
+                            Collectors.toMap(ProductItem::getId, productItem -> productItem));
+
+            List<ProductOrderResponse> productResponses = order.getProducts().stream()
+                    .map(product -> {
+                        ProductItem productItem = productMap.get(product.getProductId());
+                        if (productItem == null) {
+                            log.warn("Product not found: {}", product.getProductId());
+                            return null;
+                        }
+                        return orderMapper.mapProductToResponse(productItem,product);
+                    }).filter(Objects::nonNull)
+                    .toList();
+
+
+            responseOrderBuilder.clearProducts();
+            responseOrderBuilder.addAllProducts(productResponses);
+
+        } catch (InterruptedException e) {
+            throw new RuntimeException("Interrupted while waiting for grpc response ", e);
+        }
+
+        return responseOrderBuilder.build();
     }
 
     @Override

@@ -8,7 +8,7 @@ public interface OrderService {
     Order getOrderById(OrderId id);
     ListOrdersResponse getAllOrders();
     ListOrdersResponse getAllOrdersByUser(UserId id);
-    ListOrdersResponse getAllOrdersByCode(OrderCode code);
+    Order getOrderByCode(OrderCode code);
     ListOrdersResponse getAllOrdersByDateRange(DateRange dateRange);
     OrderResponse updateRequest(UpdateOrder request);
     OrderResponse deleteOrder(OrderId id);

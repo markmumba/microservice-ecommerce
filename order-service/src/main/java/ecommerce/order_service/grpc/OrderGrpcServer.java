@@ -76,10 +76,10 @@ public class OrderGrpcServer extends OrderServiceGrpc.OrderServiceImplBase {
     }
 
     @Override
-    public void getOrdersByCode(OrderCode request, StreamObserver<ListOrdersResponse> responseObserver) {
+    public void getOrderByCode(OrderCode request, StreamObserver<Order> responseObserver) {
         try {
 
-            ListOrdersResponse response = orderService.getAllOrdersByCode(request);
+            Order response = orderService.getOrderByCode(request);
             responseObserver.onNext(response);
             responseObserver.onCompleted();
         } catch (Exception e) {

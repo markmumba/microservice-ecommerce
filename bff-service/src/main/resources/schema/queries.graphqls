@@ -14,7 +14,7 @@ type  Query {
     getOrderById(id: ID!): Order
     getAllOrders: [Order!]
     getOrdersByUser(userId: ID!): [Order!]
-    getOrdersByCode(orderCode: String!): [Order!]
+    getOrderByCode(orderCode: String!): Order
     getOrdersByDateRange(input: DateRangeInput!): [Order!]
 
 }

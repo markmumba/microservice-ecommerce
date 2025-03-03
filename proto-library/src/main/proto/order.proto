@@ -13,7 +13,7 @@ service OrderService {
   rpc getOrderById(OrderId) returns (Order);
   rpc getAllOrders(google.protobuf.Empty) returns (stream ListOrdersResponse);
   rpc getOrderByUser(UserId) returns(stream ListOrdersResponse);
-  rpc getOrdersByCode(OrderCode) returns(stream ListOrdersResponse);
+  rpc getOrderByCode(OrderCode) returns(Order);
   rpc getOrdersByDateRange(DateRange) returns (stream ListOrdersResponse);
   rpc updateOrder(UpdateOrder) returns (OrderResponse);
   rpc deleteOrder(OrderId) returns (OrderResponse);
