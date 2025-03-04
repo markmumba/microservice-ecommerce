@@ -104,64 +104,7 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findById(id.getId()).orElseThrow(
                 () -> new IllegalArgumentException("order of given id not found " + id.getId())
         );
-        ecommerce.proto_service.grpc.order.Order.Builder responseOrderBuilder =
-                orderMapper.fromOrderEntityToDto(order).toBuilder();
-
-        List<ProductItem> productItems = new ArrayList<>();
-        List<String> productIds = order.getProducts().stream().map(ProductOrder::getProductId).toList();
-        ProductIdsList productIdsList = ProductIdsList.newBuilder()
-                .addAllId(productIds)
-                .build();
-
-        CountDownLatch latch = new CountDownLatch(1);
-        asyncProductClient.getProductByIds(productIdsList, new StreamObserver<ProductListResponse>() {
-            @Override
-            public void onNext(ProductListResponse value) {
-                productItems.addAll(value.getProductsList());
-            }
-
-            @Override
-            public void onError(Throwable t) {
-                error=t;
-                latch.countDown();
-            }
-
-            @Override
-            public void onCompleted() {
-                latch.countDown();
-            }
-        });
-        try {
-            if (!latch.await(5, TimeUnit.SECONDS)) {
-                throw new RuntimeException("Timeout waiting for product response");
-            }
-            if(error != null) {
-                throw new RuntimeException("Error fetching products", error);
-            }
-            Map<String, ProductItem> productMap = productItems.stream()
-                    .collect(
-                            Collectors.toMap(ProductItem::getId, productItem -> productItem));
-
-            List<ProductOrderResponse> productResponses = order.getProducts().stream()
-                    .map(product -> {
-                        ProductItem productItem = productMap.get(product.getProductId());
-                        if (productItem == null) {
-                            log.warn("Product not found: {}", product.getProductId());
-                            return null;
-                        }
-                        return orderMapper.mapProductToResponse(productItem,product);
-                    }).filter(Objects::nonNull)
-                    .toList();
-
-
-            responseOrderBuilder.clearProducts();
-            responseOrderBuilder.addAllProducts(productResponses);
-
-        } catch (InterruptedException e) {
-            throw new RuntimeException("Interrupted while waiting for grpc response ", e);
-        }
-
-        return responseOrderBuilder.build();
+        return getOrder(order);
     }
 
 
@@ -198,6 +141,10 @@ public class OrderServiceImpl implements OrderService {
                 () -> new NoSuchElementException("order with given code not available")
         );
 
+        return getOrder(order);
+    }
+
+    private ecommerce.proto_service.grpc.order.Order getOrder(Order order) {
         ecommerce.proto_service.grpc.order.Order.Builder responseOrderBuilder =
                 orderMapper.fromOrderEntityToDto(order).toBuilder();
 

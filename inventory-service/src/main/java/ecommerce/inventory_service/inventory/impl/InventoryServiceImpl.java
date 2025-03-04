@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -109,9 +110,9 @@ public class InventoryServiceImpl implements InventoryService {
             if (error != null) {
                 throw new RuntimeException("Error fetching products", error);
             }
-            //Then we setup a map that has the product id and the product object for easier lookup
+            //Then we set up a map that has the product id and the product object for easier lookup
             Map<String, ProductItem> productMap = productItems.stream()
-                    .collect(Collectors.toMap(ProductItem::getId, productItem -> productItem));
+                    .collect(Collectors.toMap(ProductItem::getId, Function.identity()));
 
             //Now we create the response inventory with the product details
             //We loop through the inventory list then for each we create a dto which is also a builder
