@@ -7,14 +7,12 @@ import com.example.demo.codegen.types.UpdateInventoryInput;
 import com.google.protobuf.Empty;
 import ecommerce.bff_service.inventory_svc.mapper.InventoryMapper;
 import ecommerce.proto_service.grpc.inventory.*;
-import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @Service
@@ -26,30 +24,14 @@ public class InventoryService {
     private final InventoryServiceGrpc.InventoryServiceStub asyncInventoryClient;
 
 
-    public CompletableFuture<List<Inventory>> getAllItemInventory() {
-        CompletableFuture<List<Inventory>> future = new CompletableFuture<>();
+    public List<Inventory> getAllItemInventory() {
 
         List<ecommerce.proto_service.grpc.inventory.Inventory> inventories = new ArrayList<>();
 
-        asyncInventoryClient.getAllItemsInventory(Empty.newBuilder().build(), new StreamObserver<InventoryList>() {
-            @Override
-            public void onNext(InventoryList value) {
-                inventories.addAll(value.getItemsList());
-            }
-
-            @Override
-            public void onError(Throwable t) {
-                log.error("Error getting all inventories {}", t.getMessage());
-
-            }
-
-            @Override
-            public void onCompleted() {
-                List<Inventory> dgsInventory = inventories.stream().map(InventoryMapper.INSTANCE::mapToDgs).toList();
-                future.complete(dgsInventory);
-            }
+        inventoryClient.getAllItemsInventory(Empty.newBuilder().build()).forEachRemaining(inventoryList -> {
+            inventories.addAll(inventoryList.getItemsList());
         });
-        return future;
+        return inventories.stream().map(InventoryMapper.INSTANCE::mapToDgs).toList();
     }
 
     public Inventory getItemInventoryById(String id) {

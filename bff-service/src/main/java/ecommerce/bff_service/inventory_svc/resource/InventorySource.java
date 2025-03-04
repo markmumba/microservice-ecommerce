@@ -18,7 +18,7 @@ public class InventorySource {
     private final InventoryService inventoryService;
 
     @DgsQuery
-    public CompletableFuture<List<Inventory>> getAllItemsInventory () {
+    public List<Inventory> getAllItemsInventory () {
        return inventoryService.getAllItemInventory();
     }
 
