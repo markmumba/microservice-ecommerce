@@ -30,7 +30,7 @@ dependencies {
 	implementation 'io.grpc:grpc-services'
 	implementation 'io.grpc:grpc-stub'
 	implementation 'org.springframework.grpc:spring-grpc-spring-boot-starter'
-
+	implementation 'org.mockito:mockito-core:5.16.0'
 
 	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 	compileOnly 'org.projectlombok:lombok'

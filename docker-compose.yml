@@ -1,1 +1,119 @@
 
+services:
+  # Product Service
+  product-service:
+    build: ./product-service
+    ports:
+      - "9091:9091"
+    environment:
+      DATABASE_URI: mongodb://product-database:27017/product
+    depends_on:
+      - product-database
+
+  product-database:
+    container_name: product-database
+    image: mongo:latest
+    volumes:
+      - product_data:/data/db
+    ports:
+      - "27018:27017"
+
+  # Category Service
+  category-service:
+    build: ./category-service
+    ports:
+      - "9092:9092"
+    environment:
+      DATABASE_URI: mongodb://category-database:27017/category
+    depends_on:
+      - category-database
+
+  category-database:
+    container_name: category-database
+    image: mongo:latest
+    volumes:
+      - category_data:/data/db
+    ports:
+      - "27019:27017"
+
+  # Inventory Service
+  inventory-service:
+    build: ./inventory-service
+    ports:
+      - "9095:9095"
+    environment:
+      DATABASE_URI: mongodb://inventory-database:27017/inventory
+      KAFKA_BROKER: kafka-broker:9097  # Set Kafka broker address
+    depends_on:
+      - inventory-database
+      - kafka-broker
+
+  inventory-database:
+    container_name: inventory-database
+    image: mongo:latest
+    volumes:
+      - inventory_data:/data/db
+    ports:
+      - "27021:27017"
+
+  # Order Service
+  order-service:
+    build: ./order-service
+    ports:
+      - "9094:9094"
+    environment:
+      DATABASE_URI: mongodb://order-database:27017/order
+      KAFKA_BROKER: kafka-broker:9097  # Set Kafka broker address
+    depends_on:
+      - order-database
+      - kafka-broker
+
+  order-database:
+    container_name: order-database
+    image: mongo:latest
+    volumes:
+      - order_data:/data/db
+    ports:
+      - "27020:27017"
+
+  # BFF Service
+  bff-service:
+    build: ./bff-service
+    ports:
+      - "8082:8081"
+      - "9093:9093"
+    environment:
+      PRODUCT_SERVICE_ADDRESS: product-service:9091
+      CATEGORY_SERVICE_ADDRESS: category-service:9092
+      ORDER_SERVICE_ADDRESS: order-service:9094
+      INVENTORY_SERVICE_ADDRESS: inventory-service:9095
+    depends_on:
+      - product-service
+      - category-service
+      - order-service
+      - inventory-service
+
+  # Kafka for Event Streaming
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+
+  kafka-broker:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-broker:9097
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    ports:
+      - "9097:9097"
+
+volumes:
+  product_data:
+  category_data:
+  inventory_data:
+  order_data:
+

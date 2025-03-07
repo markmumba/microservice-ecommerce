@@ -44,12 +44,9 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = categoryRepository.findById(id).orElseThrow(
                 () -> new IllegalArgumentException("Category with given id not available")
         );
-
         ProductCategoryId categoryId = ProductCategoryId.newBuilder().setId(category.getId()).build();
         List<ProductItem> productItems =  new ArrayList<>();
-
         CountDownLatch latch = new CountDownLatch(1);
-
         productStub.getProductsByCategory(categoryId, new StreamObserver<ProductListResponse>() {
             @Override
             public void onNext(ProductListResponse value) {

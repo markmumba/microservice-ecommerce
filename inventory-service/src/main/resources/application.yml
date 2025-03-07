@@ -15,5 +15,5 @@ spring:
     server:
       port: ${GRPC_PORT:9095}
   kafka:
-    bootstrap-servers: localhost:9097
+    bootstrap-servers: ${KAFKA_BROKER:localhost:9097}
 
